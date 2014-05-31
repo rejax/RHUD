@@ -22,13 +22,11 @@ These are both parented to the hud, however they will not be visible unless
 The LocalPlayer is also supplied in the form of (hud table).Player
 
 Configuration options can be set and autoread by doing 
-(hud table).Config["Config Name"] = { enabled = [true/false], info = "Information to show" }.
+(hud table).Config["Config Name"] = { value = [true/false], info = "Information to show" }.
 Config options are saved in the local sqlite database, and can be accessed in the hud by 
-doing self:GetConfigBool( "config name" ). Currently only booleans are supported. 
-Others might be added in the future.
+doing self:GetConfig( "config name" )
 
 If you have any more questions ask or read through existing huds.
+You can sell any huds you make.
 
 PS: Make sure you use a unique name for your hud, or it will clash.
-
-You are allowed to sell any huds you make.

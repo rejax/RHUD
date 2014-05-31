@@ -25,6 +25,7 @@ RIM.Editor.Styles = {
 			variable = Color( 250, 200, 200 ),
 			functions = Color( 200, 200, 255 ),
 			default_text = Color( 255, 255, 255 ),
+			comment = Color( 100, 180, 100 ),
 		},
 		tabs = {
 			tab_active = Color( 130, 130, 130 ),
@@ -840,6 +841,7 @@ end
 function RIM.Editor:ColorLine( line )
 	if line:sub( 1, 1 ) == "$" then return self:GetColor( "syntax", "config_setting" ) end
 	if line:sub( 1, 2 ) == ">>" then return self:GetColor( "syntax", "information" ) end
+	if line:sub( 1, 2 ) == "--" then return self:GetColor( "syntax", "comment" ) end
 	if line:sub( 1, 3 ) == "var" then return self:GetColor( "syntax", "variable" ) end
 		
 	if line:find( "[=-]>" ) or line:sub( 1, 2 ) == "<>" then return self:GetColor( "syntax", "functions" ) end

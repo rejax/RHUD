@@ -110,11 +110,16 @@ function RHUD:OpenChoiceMenu()
 	self.MenuFrame = base
 end
 
-local vals = { ["boolean"] = function( b ) return b and "Enabled" or "Disabled" end }
+local vals = { 
+	["boolean"] = function( b ) return b and "Enabled" or "Disabled" end,
+	["number"] = function( n ) return n end,
+	["table"] = function( c ) return ("Color(%i,%i,%i)"):format( c.r, c.g, c.b ) end
+}
+
 local function Typeify( val )
 	local v = vals[type(val)]
-	local t = { status = false, kind = type(val), value = val }
-	if v then t.status = v( val ) end
+	if not v then return end
+	local t = { status = false, kind = type(val), value = val, status = v( val ) }
 	return t
 end
 
@@ -263,8 +268,8 @@ function RHUD:Options( p )
 			s.Configs[name] = {}
 		end
 		for k, v in pairs( hud.Config ) do
-			local typeify = { Typeify( v.enabled ), k }
-			if not typeify[1].status then continue end
+			local typeify = { Typeify( v.value ), k }
+			if not typeify[1].status then print( v ) continue end
 			local line = hudlist:AddLine( k, typeify[1].status )
 			s.Configs[name][line] = typeify
 		end
@@ -309,8 +314,54 @@ function RHUD:Options( p )
 				self:ChangeConfigValue( hud, t[2], not t[1].value )
 				s:LayoutHud( hud )
 			end ):SetIcon( GetIcon( not t[1].value ) )
-		elseif t[1].kind == "table" and t[1].kind.r then
-			-- is color, do shit
+		elseif t[1].kind == "number" then
+			menu:AddOption( "Change value", function()
+				Derma_StringRequest( "New Value", "Enter the new value", t[1].value, function( val )
+					val = tonumber( val )
+					if not val then Derma_Message( "Invalid Number", "Ok" ) return end
+					
+					self:ChangeConfigValue( hud, t[2], val )
+					s:LayoutHud( hud )
+				end, function() end, "Confirm" )
+			end ):SetIcon( "icon16/pencil.png" )
+		elseif t[1].kind == "table" and t[1].value.r then
+			menu:AddOption( "Change color", function()
+				local newval = t[1].value
+				local oldval = newval
+			
+				local b = vgui.Create( "DFrame" )
+				b.Think = function() if not IsValid( hudlist ) then b:Remove() end end
+				b:SetTitle( "New Color" )
+				b:SetSize( 500, 500 )
+				b:Center()
+				b:MakePopup()
+				b.OnClose = function()
+					self:ChangeConfigValue( hud, t[2], oldval )
+					s:LayoutHud( hud )
+				end
+			
+			local color = vgui.Create( "DColorMixer", b )
+				color:Dock( FILL )
+				color:SetPalette( true )
+				color:SetAlphaBar( false )
+				color:SetWangs( true )
+				color:SetColor( newval )
+				color.ValueChanged = function( c, col )
+					newval = col
+					self:ChangeConfigValue( hud, t[2], newval, true )
+					s:LayoutHud( hud )
+				end
+				
+			local acc = vgui.Create( "DButton", b )
+				acc:Dock( BOTTOM )
+				acc:SetText( "Accept" )
+				acc.DoClick = function()
+					self:ChangeConfigValue( hud, t[2], newval )
+					s:LayoutHud( hud )
+					b:Remove()
+				end
+				
+			end ):SetIcon( "icon16/palette.png" )
 		end
 		
 		local info = menu:AddOption( self:GetHudNamed( hud ).Config[t[2]].info ) -- ew, make this better pls

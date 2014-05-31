@@ -14,7 +14,7 @@ RIM.Parser.Operators["%$"] = function( line, words, _, t )
 	local t2 = string.Explode( ",", t[2] )
 	local on, info = t2[1], t2[2]:sub( 2 )
 	
-	return Format( "RIMHUD.Config[ [[%s]] ]={enabled=%s,info=[[%s]]}", config_name, on, info )
+	return Format( "RIMHUD.Config[ [[%s]] ]={value=%s,info=[[%s]]}", config_name, on, info )
 end
 
 RIM.Parser.Operators["->"] = function( line )

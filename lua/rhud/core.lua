@@ -13,11 +13,11 @@ RHUD.Fallback = {
 	Name = "No Name",
 	UsesAvatar = false,
 	UsesPlayerModel = false,
-	GetConfigBool = function( hud, name ) return hud.Config[name].enabled end,
+	GetConfig = function( hud, name ) return hud.Config[name].value end,
 	GetConfigValues = function( hud )
 		local t = table.Copy( hud.Config )
 		for name, val in pairs( t ) do
-			t[name] = val.enabled
+			t[name] = val.value
 		end
 		return t
 	end,

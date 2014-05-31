@@ -3,7 +3,7 @@ HUD.Name = "Simple"
 HUD.UsesPlayerModel = true
 HUD.Gamemode = "darkrp"
 
-HUD.Config.AutoSize = { enabled = false, info = "Stretch to fit largest element" }
+HUD.Config.AutoSize = { value = false, info = "Stretch to fit largest element" }
 
 HUD.CircleMat = Material( "sgm/playercircle", "noclamp" )
 HUD.HPMat = Material( "sgm/playercircle", "noclamp" )
@@ -159,7 +159,7 @@ local money_amt = ""
 function HUD:Draw()
 	local wide = 0
 	
-	if self.Config.AutoSize.enabled then
+	if self:GetConfig( "AutoSize" ) then
 		for _, v in pairs( self.Vars ) do
 			if not isstring( v ) then continue end
 			

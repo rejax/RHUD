@@ -2,8 +2,8 @@ local HUD = RHUD:CreateHud()
 HUD.Name = "TTT"
 HUD.Gamemode = "terrortown"
 
-HUD.Config.EnableAnimations = { enabled = true, info = "Enable/Disable animations" }
-HUD.Config.EnableTrailingBars = { enabled = true, info = "Toggle the bars that follow the animated hp/ammo bars" }
+HUD.Config.EnableAnimations = { value = true, info = "Enable/Disable animations" }
+HUD.Config.EnableTrailingBars = { value = true, info = "Toggle the bars that follow the animated hp/ammo bars" }
 
 RHUD:CreateFont( "rhud_ttt_time", "Roboto", 40 )
 RHUD:CreateFont( "rhud_ttt_spec", "Roboto", 38 )
@@ -75,9 +75,9 @@ function HUD:DrawHealth()
 	local dec = RHUD:GetHealthPercentage( self.Player )
 	local w = health_desired * dec
 	
-	if self:GetConfigBool( "EnableAnimations" ) then
+	if self:GetConfig( "EnableAnimations" ) then
 		if self.health_w ~= w then self.health_w = Lerp( .05, self.health_w, w ) end
-		if self:GetConfigBool( "EnableTrailingBars" ) then
+		if self:GetConfig( "EnableTrailingBars" ) then
 			if self.health_trail ~= w then self.health_trail = Lerp( .03, self.health_trail, w ) end
 		else
 			self.health_trail = 0
@@ -107,9 +107,9 @@ function HUD:DrawAmmo()
 	local div = clip / max
 	local w = health_desired * div
 	
-	if self:GetConfigBool( "EnableAnimations" ) then
+	if self:GetConfig( "EnableAnimations" ) then
 		if self.ammo_w ~= w then self.ammo_w = Lerp( .04, self.ammo_w, w ) end
-		if self:GetConfigBool( "EnableTrailingBars" ) then
+		if self:GetConfig( "EnableTrailingBars" ) then
 			if self.ammo_trail ~= w then self.ammo_trail = Lerp( .02, self.ammo_trail, w ) end
 		else
 			self.ammo_trail = w
@@ -147,7 +147,7 @@ function HUD:Draw()
 		w = 0
 		rolestring = ""
 	end
-	if self:GetConfigBool( "EnableAnimations" ) then
+	if self:GetConfig( "EnableAnimations" ) then
 		if roleb_w ~= w then roleb_w = Lerp( .2, roleb_w, w ) end
 	else
 		roleb_w = w
@@ -181,7 +181,7 @@ function HUD:DrawSpectator()
 		local spec_hp = math.min( hp/100, 1 )
 		local str, col = util.HealthToString( hp )
 		
-		if self:GetConfigBool( "EnableAnimations" ) then
+		if self:GetConfig( "EnableAnimations" ) then
 			if p_hp ~= spec_hp then p_hp = Lerp( .1, p_hp, spec_hp ) end
 		else
 			p_hp = spec_hp
@@ -196,7 +196,7 @@ function HUD:DrawSpectator()
 		draw.RoundedBox( 0, box_x, ScrH() - 40, box_w, 2, Color( 10, 10, 10, 150 ) )
 	end
 	
-	if self:GetConfigBool( "EnableAnimations" ) then
+	if self:GetConfig( "EnableAnimations" ) then
 		if t_h ~= h then t_h = Lerp( .1, t_h, h ) end
 	else
 		t_h = h

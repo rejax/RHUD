@@ -2,7 +2,7 @@ local HUD = RHUD:CreateHud()
 HUD.Name = "Velocity"
 HUD.Gamemode = "deathrun"
 HUD.UsesAvatar = true
-HUD.Config.DrawArrow = { enabled = false, info = "Draw an arrow on the velocity bar that rotates based on speed" }
+HUD.Config.DrawArrow = { value = false, info = "Draw an arrow on the velocity bar that rotates based on speed" }
 
 RHUD:CreateFont( "rhud_velocity", "Tahoma", 18 )
 RHUD:CreateFont( "rhud_velocity_team", "Tahoma", 18, { weight = 800 } )
@@ -70,7 +70,7 @@ function HUD:Draw()
 		draw.RoundedBox( 0, 106, ScrH() - 50, healthbar_w, 18, Color( 150, 60, 60 ) )
 		draw.SimpleText( self.Player:Health(), "rhud_velocity", 108, ScrH() - 50, color_white )
 		
-		if self:GetConfigBool( "DrawArrow" ) then
+		if self:GetConfig( "DrawArrow" ) then
 			local rot = ( -90 * ( len_dec ) )
 			surface.SetDrawColor( 255, 255, 255, 255 * len_dec )
 			surface.SetTexture( arrow )

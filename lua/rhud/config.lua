@@ -25,7 +25,7 @@ function RHUD:LoadConfigs()
 				if hud and config.Config ~= "[]" then
 					for id, val in pairs( save ) do
 						if hud.Config[id] then
-							hud.Config[id].enabled = val
+							hud.Config[id].value = val
 						else
 							save[id] = nil
 						end
@@ -46,7 +46,7 @@ function RHUD:UpdateConfigs()
 		if nHud then
 			for c_n, c_val in pairs( hud.Config ) do
 				if nHud.Config[c_n] then
-					nHud.Config[c_n].enabled = c_val.enabled
+					nHud.Config[c_n].value = c_val.value
 				end
 			end
 		end
@@ -57,9 +57,11 @@ function RHUD:ReloadConfigs( hud )
 	self:GetHudNamed( hud ).Config = table.Copy( self:GetFullHudNamed( hud ).Config )
 end
 
-function RHUD:ChangeConfigValue( hud, key, val )
+function RHUD:ChangeConfigValue( hud, key, val, dont_save )
 	local hud_config = self:GetHudNamed( hud ).Config
-	hud_config[key].enabled = val
+	hud_config[key].value = val
+	
+	if dont_save then return end
 	
 	self:SaveConfigs( hud )
 end

@@ -1,6 +1,6 @@
 local HUD = RHUD:CreateHud()
-HUD.Config.DrawIcons = { enabled = true, info = "Draw icons beside the various stat bars" }
-HUD.Config.ExpandBGToAvailableBars = { enabled = true, info = "Draw the background of the health area to the amount of bars available" }
+HUD.Config.DrawIcons = { value = true, info = "Draw icons beside the various stat bars" }
+HUD.Config.ExpandBGToAvailableBars = { value = true, info = "Draw the background of the health area to the amount of bars available" }
 
 HUD.Name = "Generic"
 HUD.Gamemode = "darkrp"
@@ -50,7 +50,7 @@ function HUD:Draw()
 	surface.DrawTexturedRect( 22, ScrH() - 98, wide - 4, bh - 4 )
 	
 	local h = 74
-	if self:GetConfigBool( "ExpandBGToAvailableBars" ) then
+	if self:GetConfig( "ExpandBGToAvailableBars" ) then
 		h = 28
 		if self.Player:Armor() > 0 then h = 50 end
 		if self.hunger then h = 74 end
@@ -58,7 +58,7 @@ function HUD:Draw()
 	
 	draw.RoundedBox( 0, 23, ScrH() - 97, 160, h, Color( 30, 30, 30, 100 ) )
 	
-	if self:GetConfigBool( "DrawIcons" ) then 
+	if self:GetConfig( "DrawIcons" ) then 
 		if self.Player:Health() < 20 then
 			local mul = 21 - self.Player:Health()
 			local strdiv = math.min( 1, math.abs( math.sin( CurTime() + mul ) ) )

@@ -3,7 +3,7 @@ HUD.Name = "Moose"
 HUD.Gamemode = "deathrun"
 
 HUD.UsesAvatar = true
-HUD.Config.DarkBorder = { enabled = false, info = "Use a dark border instead of white" }
+HUD.Config.DarkBorder = { value = false, info = "Use a dark border instead of white" }
 
 RHUD:CreateFont( "rhud_moose", "Coolvetica", 48 )
 RHUD:CreateFont( "rhud_moose_big", "Coolvetica", 50 )
@@ -27,7 +27,7 @@ local hp_w = 0
 function HUD:Draw()
 	local w = RHUD:GetHealthPercentage( self.Player ) * 173
 	hp_w = hp_w == w and hp_w or Lerp( .1, hp_w, w )
-	local col = self:GetConfigBool( "DarkBorder" )
+	local col = self:GetConfig( "DarkBorder" )
 	if col then col = color_black else col = color_white end
 	
 	if self.Player:Alive() then
