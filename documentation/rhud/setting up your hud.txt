@@ -1,0 +1,16 @@
+Writing a hud is supposed to be as easy as possible
+Create an addon, call it whatever you want.
+Set up the folders like this -- lua/rhud/huds/gamemode/hud.lua
+Then you can write your hud, and it will be loaded!
+
+if you want to take advantage of a feature which allows for neater 
+file structure if you have a massive hud (maybe you're rewriting the scoreboard, too), 
+you can set up the folders like this -- lua/rhud/huds/gamemode/yourhudname/
+the only file that will be executed is core.lua, so make sure your file is named that.
+if you have set it up like so, you can call HUD:Include( name, file ) 
+this will include the file for the hud, and set whatever you specified as "name" to be a pointer to the hud
+so if my hud table is called HUD, I can do HUD:Include( "HUD", "scoreboard.lua" )
+then in scoreboard.lua, I can call print( HUD.Name )
+This way you can reskin as much as you want, without having a lot of clutter.
+
+for the actual Lua documentation, open "writing a hud.txt"

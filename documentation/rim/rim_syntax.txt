@@ -1,0 +1,28 @@
+RIM has a very simple syntax.
+
+	$ 
+		used for adding config options to the hud
+		$Config1 = true/false, information about the config option
+		
+	>> 
+		used to denote important details about the hud, like name, author, and gamemode
+		>>Name = super cool hud
+		
+	var
+		used to create static variables
+		var x = y
+		
+		globals are fine for things that change ( x = y )
+	
+	FunctionName ->
+		creates a function, variables are added like so
+		FunctionName [ variable1, variable2 ] ->
+		you do not need to add ends, whitespace is parsed. if you REALLY want to, <> or end is used.
+		
+the following colors can be used as globals (just write the color name)
+		white = Color( 255, 255, 255 )
+		black = Color( 0, 0, 0 )
+		red = Color( 255, 0, 0 )
+		green = Color( 0, 255, 0 )
+		blue = Color( 0, 0, 255 )
+	

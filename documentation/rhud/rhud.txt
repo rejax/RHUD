@@ -1,0 +1,34 @@
+RHUD is a free project aimed to make the heads up display design of servers better (or easier to change if worse).
+
+Any hud located in lua/rhud/huds/ will be mounted and ready 
+to use if the correct gamemode is playing or the hud is useable across all gamemodes.
+
+If I put a hud (for example "simple") in lua/rhud/huds/sandbox/simple/, 
+it needs to be called core.lua - or it won't get mounted. This way you can
+have tidier huds if you choose to replace weapon wheels or scoreboards. 
+
+Most elements of the hud are replaceable. If the hud has the function .ShowScoreboard, 
+the default scoreboard will not show and yours will. Huds can add elements to the table 
+HideElements in the hud table to hide anything, instead of using the HUDShouldDraw hook.
+(A list can be found http://maurits.tv/data/garrysmod/wiki/wiki.garrysmod.com/index5865.html here)
+
+For developers, some helper functions can be utilised. You can find them in "writing a hud.txt" or rhud/helper.lua, 
+if it's not obvious what they do you can look at the default huds included with rhud to get a better idea.
+
+The players avatar is also supplied to the hud in the form of (hud table).Avatar, as well as a 
+dmodelpanel of the playermodel (.PlayerModel). 
+These are both parented to the hud, however they will not be visible unless 
+(hud table).UsesAvatar and (hud table).UsesPlayerModel are set to boolean true.
+The LocalPlayer is also supplied in the form of (hud table).Player
+
+Configuration options can be set and autoread by doing 
+(hud table).Config["Config Name"] = { enabled = [true/false], info = "Information to show" }.
+Config options are saved in the local sqlite database, and can be accessed in the hud by 
+doing self:GetConfigBool( "config name" ). Currently only booleans are supported. 
+Others might be added in the future.
+
+If you have any more questions ask or read through existing huds.
+
+PS: Make sure you use a unique name for your hud, or it will clash.
+
+You are allowed to sell any huds you make.

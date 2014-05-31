@@ -1,0 +1,39 @@
+When writing a hud, there are a few things you can use to help.
+Firstly, you can look at the example hud.lua file included to get an idea of the basic structure.
+Keep in mind the only functions you actually need are HUD:Init() and HUD:Draw(), the rest are optional.
+
+You need to set HUD.UsesAvatar/HUD.UsesPlayerModel to true to show the specified element!!
+
+In your hud, you have access to
+	HUD:GetConfigBool( "configname" )
+	HUD.HideElements = { ["Something I want to hide"] = false }
+	HUD.Config["NewConfigOption"] = { enabled = true, info = "hello" }
+
+Some RHUD helper functions:
+	[RHUD:CreateFont( 
+		string name, 
+		string font, 
+		number size, 
+		table extra (extra will be added to the table used in the surface.CreateFont call )
+	)]
+	[RHUD:DrawImageLabel(
+		number x, 
+		number y, 
+		IMaterial img, 
+		string font, 
+		string text, 
+		Color color, 
+		Color imgcol -- optional
+	)]
+	[RHUD:GetHealthPercentage( Player, Maxiumum HP (defaults to 100) )]
+	[RHUD:GetArmorPercentage( Player, Maxiumum Armor (defaults to 100) )]
+	
+	[RHUD:PaintAvatar() -- Paints the avatar to the screen]
+	[RHUD:PaintModel() -- Paints the playermodel to the screen]
+	
+	[RHUD:GetDarkRPVars() -- returns the table of darkrp vars]
+	
+	[RHUD:Include( id, file ) -- includes a file if your hud is in it's own folder]
+	
+If your hud has a function called ShowScoreboard, the scoreboard will be hidden.
+If you are writing a hud for TTT, adding a function called DrawWepSwitch( WSWITCH table ) will cause it to hide.

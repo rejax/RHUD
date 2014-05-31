@@ -1,0 +1,7 @@
+RIM is an acronym for something that I can't remember. It was dumb.
+It is a simple way of writing a hud that you can use across any server, as long as rhud is installed on the server.
+This way, even if all custom huds look awful to you, you can still use your own.
+The syntax is as simple as possible, it's supposed to be fairly easy to learn. Essentially it's the lobotomized little brother of Lua.
+
+There is some basic symbols for RHUD support, and a looser syntax generally.
+See "example rim hud.txt", and "rim_syntax.txt" for documentation.

@@ -1,0 +1,29 @@
+-- Standard Lua comments
+
+-- >> is used to add variables to the hud table, used by RHUD
+>>Name = RIM HUD
+>>Author = rejax
+
+-- variables can be declared like this
+var variable = 20
+
+-- some convinience functions are supplied, see the included rim_functions.txt for a list
+CreateFont( "rim_1_test", "Coolvetica", 20 )
+
+-- functions are declared like this, like doing function HUD:Init()
+Init ->
+	SetAvatarPos( 30, ScrH - 95 )
+	SetAvatarSize( 64, 64 )
+-- you don't need to add an end, whitespace is parsed automatically and functions are closed
+
+Draw ->
+	DrawBox( 25, ScrH - 100, 260, 75, Color( 50, 50, 50 ) )
+	DrawText( "Money = $*rp_money", "rim_1", 100, ScrH - 95, white )
+	DrawText( "*rp_name", "rim_1", 100, ScrH - 75, white )
+	DrawText( "My job is a *rp_job*, it's ok", "rim_1", 100, ScrH - 55, white )
+	Draw_Avatar( "string text" )
+	
+-- this is how you add variables to a function.
+Draw_Avatar [ variable ] ->
+	  DrawAvatar()
+	  echo variable

@@ -1,0 +1,46 @@
+DrawBox
+	Draws a box, same arguments as draw.RoundedBox (http://wiki.garrysmod.com/page/draw/RoundedBox)
+
+SetAvatarPos
+	( position x, position y )
+	Sets the position of the avatar
+
+SetAvatarSize
+	( width, height )
+	Sets the size of the avatar
+
+DrawAvatar
+	Draws the avatar to the screen.
+
+CreateFont
+	Same as RHUD:CreateFont( ... )
+	Check the RHUD functions guide
+	
+echo
+	prints something to console
+
+DrawText
+	Same arguments as draw.SimpleText (http://wiki.garrysmod.com/page/draw/SimpleText)
+	However, the text will be filtered and parsed using various keywords when the * operator is used.
+	For example, "*rp_money" will show someone's darkrp money.
+	This can be used in long strings, in a format like so -
+	
+	"Hello, my name is *name*, I have $*rp_money* dollars!" => ("Hello, my name is rejax, I have $1234 dollars!")
+	This is the current list of parse tags -
+		["rp_money"] = returns the players rp money
+		["rp_job"] = returns the players rp job
+		["rp_salary"] = returns the players rp salary
+		["rp_name"] = returns the players rp name
+		["rp_hunger"] = returns the players hunger (if hungermod enabled)
+		["name"] = returns the players name
+		["health"] = returns the players health
+		["ttt_role"] = returns the role of the player ("Traitor","Innocent","Detective",etc)
+		["ttt_rawrole"] = returns the number of the players role
+		
+You also have access to the following lua functions/libraries
+	ScrH() and ScrW(),
+	Lerp, 
+	GetRoundTime (returns the ttt round time remaining),
+	print,
+	
+	the draw, surface, and render libraries.
