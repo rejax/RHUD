@@ -92,12 +92,8 @@ RIM.Parser.Functions["CreateFont"] = function( line )
 	return "RHUD:"..line
 end
 
-RIM.Parser.Functions["GetConfigBool"] = function( line )
+RIM.Parser.Functions["GetConfig"] = function( line )
 	return line:gsub( "GetConfig", "RIMHUD:GetConfig" )
-end
-
-RIM.Parser.Functions["ConfigBool"] = function( line )
-	return line:gsub( "ConfigBool", "RIMHUD:GetConfigBool" )
 end
 
 RIM.Parser.TextParse = {
