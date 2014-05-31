@@ -74,7 +74,7 @@ end
 --	I wonder what they're used for
 --
 AccessorFunc( RHUD, "DarkRPVars", "DarkRPVars" )
-hook.Add( "DarkRPVarChanged", "RHUD_DarkRPVars", function( _, var, _, val ) RHUD.DarkRPVars[var] = val end )
+hook.Add( "DarkRPVarChanged", "RHUD_DarkRPVars", function( ply, var, _, val ) if ply == LocalPlayer() then RHUD.DarkRPVars[var] = val end end )
 
 --
 --	Allows huds to include files in the same director, to make
