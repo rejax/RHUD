@@ -134,5 +134,14 @@ function RIM:Compile( hud, success, fail )
 
 	hud.Compiled = setfenv( str, env )
 	hud.Compiled()
-	success()
+	
+	if not hud.Name then
+		fail()
+		error( Format( "RIM COMPILE ERROR: File:'%s' is missing Name variable!", hud.FileName ) )
+	elseif not hud.Draw then
+		fail()
+		error( Format( "RIM COMPILE ERROR: File:'%s' is missing Draw function!", hud.FileName ) )
+	else
+		success()
+	end
 end
