@@ -505,6 +505,7 @@ end
 function RIM.Editor:BuildTab( parent, code_tab, name, web )
 	local edit = {}
 	edit.Saved = true
+	edit.FirstLetter = true
 	edit.Name = name
 	edit.Code = table.Copy( code_tab )
 	edit.Lines = {}
@@ -541,8 +542,9 @@ function RIM.Editor:BuildTab( parent, code_tab, name, web )
 		return table.concat( t, "\n" )
 	end
 	
-	edit.IsSaved = function( s ) 
+	edit.IsSaved = function( s )
 		if s.Edit:IsVisible() then s:LoseFocus( true ) end
+		if #s.Lines == 1 and not s.Lines[1]:GetText():find( "%a" ) then return true end
 		for l, pnl in pairs( s.Lines ) do
 			if s.Code[l] ~= pnl:GetText() then return false end
 		end
@@ -706,7 +708,7 @@ function RIM.Editor:BuildTab( parent, code_tab, name, web )
 	end
 	
 	edit.BackLine = function( s )
-		local line = s.ActiveLine
+		local line = s.Edit.Line--s.ActiveLine
 		local linetext = s.ActiveLinePanel:GetText()
 		if not edit.Lines[line-1] then return end
 		local oldl = edit.Lines[line-1]:GetText()
@@ -754,8 +756,14 @@ function RIM.Editor:MakeTextEditor( parent, wide, edit_t )
 		edit.OnEnter = function(s)
 			edit_t:Enter()
 		end
+		edit.OnChange = function() edit_t.Saved = false end
 		edit.Hidden = false
+		
 		edit.OnKeyCode = function( s, key )
+			if edit_t.FirstLetter then
+				s:SetText( s:GetText():sub( 2 ) )
+				edit_t.FirstLetter = false
+			end
 			if key == KEY_TAB then
 				local cpos = s:GetCaretPos()
 				local line = edit_t.ActiveLinePanel
@@ -803,7 +811,7 @@ function RIM.Editor:MakeTextEditor( parent, wide, edit_t )
 			end
 			return pos, text
 		end
-		edit.OnChange = function() edit_t.Saved = false end
+		
 		edit.PaintOver = function( s, w, h )
 			if s.Hidden then return end
 			surface.DisableClipping( true )
@@ -827,10 +835,12 @@ function RIM.Editor:MakeTextEditor( parent, wide, edit_t )
 				edit_t.Lines[s.Line]:SetTextColor( s:GetTextColor() )
 			end
 			s:SetTextColor( self:ColorLine( s:GetText() ) )
-			if input.IsKeyDown( KEY_S ) and input.IsControlDown() then
-				if s.LastSave + 1 < CurTime() then
-					self:SaveActiveTab()
-					s.LastSave = CurTime()
+			if input.IsControlDown() then
+				if input.IsKeyDown( KEY_S ) then
+					if s.LastSave + 1 < CurTime() then
+						self:SaveActiveTab()
+						s.LastSave = CurTime()
+					end
 				end
 			end
 		end
