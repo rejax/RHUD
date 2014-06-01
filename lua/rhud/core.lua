@@ -73,6 +73,7 @@ function RHUD:SelectHud( name )
 	old:OnChanged()
 	
 	self.ActiveHud = name
+	file.Write( self.FilePath, name )
 	
 	local hud = self:GetHudNamed( name )
 	if hud.None then 
@@ -186,11 +187,21 @@ function RHUD:Init()
 		GAMEMODE.HUDPaint = function() end
 	end
 	
-	if self.Defaults[self.Gamemode] then
-		self.DefaultHud = self.Defaults[self.Gamemode]
-		if not self.Huds[self.DefaultHud] then self.DefaultHud = "none" end
-	else
-		self.DefaultHud = "none"
+	self.FilePath = ("rhud/%s.txt"):format( self.Gamemode )
+	if file.Exists( self.FilePath, "DATA" ) then
+		local hud = file.Read( self.FilePath, "DATA" )
+		if self.Huds[hud] then self.DefaultHud = hud end
+	end
+	
+	if not self.DefaultHud then
+		if self.Defaults[self.Gamemode] then
+			self.DefaultHud = self.Defaults[self.Gamemode]
+			if not self.Huds[self.DefaultHud] then self.DefaultHud = "none" end
+		else
+			self.DefaultHud = "none"
+		end
+		if not file.IsDir( "rhud", "DATA" ) then file.CreateDir( "rhud" ) end
+		file.Write( self.FilePath, self.DefaultHud )
 	end
 	
 	self:LoadConfigs()
