@@ -125,7 +125,7 @@ function RIM:Compile( hud, success, fail )
 		ScrH = ScrH(), ScrW = ScrW(),
 		Color = Color, Material = Material,
 		Lerp = Lerp, GetRoundTime = roundtime,
-		draw = draw, surface = surface, render = render,
+		draw = draw, surface = surface, render = render, math = math,
 		print = print,
 	}
 	table.foreach( colors, function( k, col ) env[k] = col end )
