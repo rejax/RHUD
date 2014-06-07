@@ -760,7 +760,7 @@ function RIM.Editor:MakeTextEditor( parent, wide, edit_t )
 		edit.Hidden = false
 		
 		edit.OnKeyCode = function( s, key )
-			if edit_t.FirstLetter then
+			if edit_t.FirstLetter and not s:GetText():find( "%a" ) then
 				s:SetText( s:GetText():sub( 2 ) )
 				edit_t.FirstLetter = false
 			end
