@@ -1,7 +1,7 @@
 local function LoadHuds( dir, in_folder )
-	local huds, folders = file.Find( "rhud/huds/" .. dir, "LUA" )
+	local huds, folders = file.Find( "rhud/huds/" .. dir:lower(), "LUA" )
 	for f, hud in pairs( huds ) do
-		local location = "rhud/huds/" .. dir:gsub("*","") .. hud
+		local location = ("rhud/huds/" .. dir:gsub("*","") .. hud):lower()
 		if SERVER then
 			AddCSLuaFile( location )
 		else
