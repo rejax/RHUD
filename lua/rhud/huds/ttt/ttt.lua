@@ -87,9 +87,11 @@ function HUD:DrawHealth()
 		self.health_trail = w
 	end
 	
+	local health_t = math.Clamp( self.health_trail, 0, health_desired )
+	local health_w = math.Clamp( self.health_w, 0, health_desired )
 	draw.RoundedBox( 0, 21, ScrH() - 75, health_desired, 20, Color( 100, 50, 60 ) )
-	draw.RoundedBox( 0, 21, ScrH() - 75, self.health_trail, 20, Color( 140, 40, 50 ) )
-	draw.RoundedBox( 0, 21, ScrH() - 75, self.health_w, 20, Color( 150, 50, 60 ) )
+	draw.RoundedBox( 0, 21, ScrH() - 75, health_t, 20, Color( 140, 40, 50 ) )
+	draw.RoundedBox( 0, 21, ScrH() - 75, health_w, 20, Color( 150, 50, 60 ) )
 	draw.SimpleText( self.Player:Health(), "rhud_ttt_health", 265, ScrH() - 70, color_white )
 end
 
@@ -119,9 +121,11 @@ function HUD:DrawAmmo()
 		self.ammo_trail = w
 	end	
 	
+	local ammo_t = math.Clamp( self.ammo_trail, 0, health_desired )
+	local ammo_w = math.Clamp( self.ammo_w, 0, health_desired )
 	draw.RoundedBox( 0, 21, ScrH() - 50, health_desired, 20, Color( 150, 140, 30 ) )
-	draw.RoundedBox( 0, 21, ScrH() - 50, self.ammo_trail, 20, Color( 180, 170, 60 ) )
-	draw.RoundedBox( 0, 21, ScrH() - 50, self.ammo_w, 20, Color( 200, 190, 80 ) )
+	draw.RoundedBox( 0, 21, ScrH() - 50, ammo_t, 20, Color( 180, 170, 60 ) )
+	draw.RoundedBox( 0, 21, ScrH() - 50, ammo_w, 20, Color( 200, 190, 80 ) )
 	draw.SimpleText( clip .. " + " .. held, "rhud_ttt_ammo", 265, ScrH() - 45, color_white )
 	--draw.SimpleText( "lnv - " .. held, "rhud_ttt_ammo2", 265, ScrH() - 40, color_white )
 end
