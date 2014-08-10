@@ -64,7 +64,7 @@ function HUD:Init()
 	
 	   shadow = 100
 	}
-
+	GAMEMODE.HUDDrawPickupHistory = nil
 end
 
 function HUD:DrawTime( w, endtime, round )
@@ -244,6 +244,7 @@ function HUD:Draw()
 	self:DrawTime( roleb_w, endtime, round )
 	self:DrawHealth()
 	self:DrawAmmo()
+	self:HUDDrawPickupHistory()
 end
 
 local p_hp, t_h = 0, 80
@@ -300,6 +301,92 @@ function HUD:DrawSpectator()
 	
 	draw.RoundedBox( 0, posx_roundb, ScrH() - t_h - 20, roundw, 20, Color( 30, 30, 30, 150 ) )
 	draw.SimpleText( round, "rhud_ttt_spec_sml", posx_round, ScrH() - t_h - 20, color_white )
+end
+
+local pickupclr = {
+	//Innocent
+	["5517050"]  = Color(25, 150, 25, 200),
+	//Traitor
+	["1805040"]   = Color(150, 25, 25, 200),
+	//Detective
+	["5060180"] = Color(25, 25, 200, 200),
+	//Ammo
+	["2051550"] = Color(230, 125, 35, 255),
+}
+
+function HUD:HUDDrawPickupHistory()
+	if GAMEMODE == nil then return end
+	if (GAMEMODE.PickupHistory == nil) then return end
+	
+	local x, y = ScrW() - GAMEMODE.PickupHistoryWide - 20, GAMEMODE.PickupHistoryTop
+	local tall = 0
+	local wide = 0
+
+	for k, v in pairs( GAMEMODE.PickupHistory ) do
+
+		if v.time < CurTime() then	
+
+			if (v.y == nil) then v.y = y end
+
+			v.y = (v.y*5 + y) / 6
+
+			local delta = (v.time + v.holdtime) - CurTime()
+			delta = delta / v.holdtime
+
+			local alpha = 255
+			local colordelta = math.Clamp( delta, 0.6, 0.7 )
+
+			if delta > (1 - v.fadein) then
+				alpha = math.Clamp( (1.0 - delta) * (255/v.fadein), 0, 255 )
+			elseif delta < v.fadeout then
+				alpha = math.Clamp( delta * (255/v.fadeout), 0, 255 )
+			end
+
+			v.x = x + GAMEMODE.PickupHistoryWide - (GAMEMODE.PickupHistoryWide * (alpha/255))
+
+
+			local rx, ry, rw, rh = math.Round(v.x-4), math.Round(v.y-(v.height/2)-4), math.Round(GAMEMODE.PickupHistoryWide+9), math.Round(v.height+8)
+			local bordersize = 8
+
+			//surface.SetTexture( GAMEMODE.PickupHistoryCorner )
+			//Tip
+			local col = pickupclr[v.color.r .. v.color.g .. v.color.b]
+			col.a = alpha
+			surface.SetDrawColor( col )
+			//surface.DrawTexturedRectRotated( rx + bordersize/2 , ry + bordersize/2, bordersize, bordersize, 0 )
+			//surface.DrawTexturedRectRotated( rx + bordersize/2 , ry + rh -bordersize/2, bordersize, bordersize, 90 )
+			//surface.DrawRect( rx, ry+bordersize,  bordersize, rh-bordersize*2 )
+			surface.DrawRect( rx+bordersize, ry, (v.height - 4)/2, rh )
+			col.a = math.Clamp( col.a - 100, 0, 255 )
+			surface.SetDrawColor( col )
+			surface.DrawRect( rx+bordersize, ry, (v.height - 4), rh )
+			//BG
+			surface.SetDrawColor( 40*colordelta, 40*colordelta, 40*colordelta, math.Clamp(alpha, 0, 200) )
+
+			surface.DrawRect( rx+bordersize+v.height-4, ry, rw - (v.height - 4), rh )
+			//surface.DrawTexturedRectRotated( rx + rw - bordersize/2 , ry + rh - bordersize/2, bordersize, bordersize, 180 )
+			//surface.DrawTexturedRectRotated( rx + rw - bordersize/2 , ry + bordersize/2, bordersize, bordersize, 270 )
+			//surface.DrawRect( rx+rw-bordersize, ry+bordersize, bordersize, rh-bordersize*2 )
+
+			draw.SimpleText( v.name, v.font, v.x+2+v.height+8, v.y - (v.height/2)+2, Color( 0, 0, 0, alpha*0.75 ) )
+
+			draw.SimpleText( v.name, v.font, v.x+v.height+8, v.y - (v.height/2), Color( 255, 255, 255, alpha ) )
+
+			if v.amount then
+				draw.SimpleText( v.amount, v.font, v.x+GAMEMODE.PickupHistoryWide+2, v.y - (v.height/2)+2, Color( 0, 0, 0, alpha*0.75 ), TEXT_ALIGN_RIGHT )
+				draw.SimpleText( v.amount, v.font, v.x+GAMEMODE.PickupHistoryWide, v.y - (v.height/2), Color( 255, 255, 255, alpha ), TEXT_ALIGN_RIGHT )
+			end
+
+			y = y + (v.height + 16)
+			tall = tall + v.height + 18
+			wide = math.Max( wide, v.width + v.height + 24 )
+
+			if alpha == 0 then GAMEMODE.PickupHistory[k] = nil end
+		end
+	end
+
+	GAMEMODE.PickupHistoryTop = (GAMEMODE.PickupHistoryTop * 5 + ( ScrH() * 0.75 - tall ) / 2 ) / 6
+	GAMEMODE.PickupHistoryWide = (GAMEMODE.PickupHistoryWide * 5 + wide) / 6
 end
 
 RHUD:RegisterHud( HUD )
