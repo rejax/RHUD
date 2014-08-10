@@ -348,14 +348,10 @@ function HUD:HUDDrawPickupHistory()
 			local rx, ry, rw, rh = math.Round(v.x-4), math.Round(v.y-(v.height/2)-4), math.Round(GAMEMODE.PickupHistoryWide+9), math.Round(v.height+8)
 			local bordersize = 8
 
-			//surface.SetTexture( GAMEMODE.PickupHistoryCorner )
 			//Tip
 			local col = pickupclr[v.color.r .. v.color.g .. v.color.b]
 			col.a = alpha
 			surface.SetDrawColor( col )
-			//surface.DrawTexturedRectRotated( rx + bordersize/2 , ry + bordersize/2, bordersize, bordersize, 0 )
-			//surface.DrawTexturedRectRotated( rx + bordersize/2 , ry + rh -bordersize/2, bordersize, bordersize, 90 )
-			//surface.DrawRect( rx, ry+bordersize,  bordersize, rh-bordersize*2 )
 			surface.DrawRect( rx+bordersize, ry, (v.height - 4)/2, rh )
 			col.a = math.Clamp( col.a - 100, 0, 255 )
 			surface.SetDrawColor( col )
@@ -364,9 +360,6 @@ function HUD:HUDDrawPickupHistory()
 			surface.SetDrawColor( 40*colordelta, 40*colordelta, 40*colordelta, math.Clamp(alpha, 0, 200) )
 
 			surface.DrawRect( rx+bordersize+v.height-4, ry, rw - (v.height - 4), rh )
-			//surface.DrawTexturedRectRotated( rx + rw - bordersize/2 , ry + rh - bordersize/2, bordersize, bordersize, 180 )
-			//surface.DrawTexturedRectRotated( rx + rw - bordersize/2 , ry + bordersize/2, bordersize, bordersize, 270 )
-			//surface.DrawRect( rx+rw-bordersize, ry+bordersize, bordersize, rh-bordersize*2 )
 
 			draw.SimpleText( v.name, v.font, v.x+2+v.height+8, v.y - (v.height/2)+2, Color( 0, 0, 0, alpha*0.75 ) )
 
