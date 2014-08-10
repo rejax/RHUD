@@ -1,5 +1,5 @@
 local HUD = RHUD:CreateHud()
-HUD.Name = "TTT"
+HUD.Name = "rejax"
 HUD.Gamemode = "terrortown"
 
 HUD.Config.EnableAnimations = { value = true, info = "Enable/Disable animations" }
@@ -34,6 +34,36 @@ function HUD:Init()
 	
 	self.ammo_w = 0
 	self.ammo_trail = 0
+
+	self.col_active = {
+	   tip = {
+	      [ROLE_INNOCENT]  = HUD.Colors.innocent,
+	      [ROLE_TRAITOR]   = HUD.Colors.traitor,
+	      [ROLE_DETECTIVE] = HUD.Colors.detective
+	   },
+	
+	   bg = Color( 40, 40, 40, 250 ),
+	
+	   text_empty = Color(200, 20, 20, 255),
+	   text = Color(255, 255, 255, 255),
+	
+	   shadow = 255
+	}
+	self.col_dark = {
+	   tip = {
+	      [ROLE_INNOCENT]  = Color(60, 160, 50, 155),
+	      [ROLE_TRAITOR]   = Color(160, 50, 60, 155),
+	      [ROLE_DETECTIVE] = Color(50, 60, 160, 155),
+	   },
+	
+	   bg = Color(40, 40, 40, 200),
+	
+	   text_empty = Color(200, 20, 20, 100),
+	   text = Color(255, 255, 255, 100),
+	
+	   shadow = 100
+	}
+
 end
 
 function HUD:DrawTime( w, endtime, round )
@@ -65,10 +95,60 @@ function HUD:DrawTime( w, endtime, round )
 	surface.SetFont( haste_f )
 	draw.SimpleText( round, "rhud_ttt_round", 30 + surface.GetTextSize( haste_t ) + w, ScrH() - 100, color_white )
 end
+local margin = 10
+local width = 300
+local height = 20
+function HUD:DrawBarBg(x, y, w, h, col)
+	local rx = math.Round(x - 4)
+	local ry = math.Round(y - (h / 2)-4)
+	local rw = math.Round(w + 9)
+	local rh = math.Round(h + 8)
 
---function HUD:DrawWepSwitch( w )
+	local b = 8 --bordersize
+	local bh = b / 2
 
---end
+	local role = LocalPlayer():GetRole() or ROLE_INNOCENT
+
+	local c = col.bg
+	surface.SetDrawColor(c.r, c.g, c.b, c.a)
+	surface.DrawRect( rx, ry,  rw,  rh )
+	
+	c = col.tip[role]
+	surface.SetDrawColor(c.r, c.g, c.b, c.a)
+	surface.DrawRect( rx, ry, b/2, rh )
+	
+	surface.SetDrawColor(c.r, c.g, c.b, c.a - 80)
+	surface.DrawRect( rx, ry, b*3, rh )
+end
+
+-- Alig96
+function HUD:DrawWepSwitch( w )
+	if not w.Show then return end
+
+	local weps = w.WeaponCache
+
+	local x = ScrW() - width - margin*2
+	local y = ScrH() - (#weps * (height + margin))
+
+	local col = self.col_dark
+
+	for k, wep in pairs(weps) do
+		if w.Selected == k then
+			col = self.col_active
+		else
+			col = self.col_dark
+		end
+
+      		self:DrawBarBg(x, y, width, height, col)
+		if not w:DrawWeapon(x, y, col, wep) then
+         
+			w:UpdateWeaponCache()
+			return
+		end
+
+      		y = y + height + margin
+   	end
+end
 
 local health_desired = 240
 function HUD:DrawHealth()
@@ -87,11 +167,9 @@ function HUD:DrawHealth()
 		self.health_trail = w
 	end
 	
-	local health_t = math.Clamp( self.health_trail, 0, health_desired )
-	local health_w = math.Clamp( self.health_w, 0, health_desired )
 	draw.RoundedBox( 0, 21, ScrH() - 75, health_desired, 20, Color( 100, 50, 60 ) )
-	draw.RoundedBox( 0, 21, ScrH() - 75, health_t, 20, Color( 140, 40, 50 ) )
-	draw.RoundedBox( 0, 21, ScrH() - 75, health_w, 20, Color( 150, 50, 60 ) )
+	draw.RoundedBox( 0, 21, ScrH() - 75, self.health_trail, 20, Color( 140, 40, 50 ) )
+	draw.RoundedBox( 0, 21, ScrH() - 75, self.health_w, 20, Color( 150, 50, 60 ) )
 	draw.SimpleText( self.Player:Health(), "rhud_ttt_health", 265, ScrH() - 70, color_white )
 end
 
@@ -104,6 +182,7 @@ function HUD:DrawAmmo()
 	if clip < 0 then return end
 	
 	local max = wep.Primary.ClipSize or 0
+	max = math.max( clip, max )
 	local held = wep:Ammo1()
 	
 	local div = clip / max
@@ -121,11 +200,9 @@ function HUD:DrawAmmo()
 		self.ammo_trail = w
 	end	
 	
-	local ammo_t = math.Clamp( self.ammo_trail, 0, health_desired )
-	local ammo_w = math.Clamp( self.ammo_w, 0, health_desired )
 	draw.RoundedBox( 0, 21, ScrH() - 50, health_desired, 20, Color( 150, 140, 30 ) )
-	draw.RoundedBox( 0, 21, ScrH() - 50, ammo_t, 20, Color( 180, 170, 60 ) )
-	draw.RoundedBox( 0, 21, ScrH() - 50, ammo_w, 20, Color( 200, 190, 80 ) )
+	draw.RoundedBox( 0, 21, ScrH() - 50, self.ammo_trail, 20, Color( 180, 170, 60 ) )
+	draw.RoundedBox( 0, 21, ScrH() - 50, self.ammo_w, 20, Color( 200, 190, 80 ) )
 	draw.SimpleText( clip .. " + " .. held, "rhud_ttt_ammo", 265, ScrH() - 45, color_white )
 	--draw.SimpleText( "lnv - " .. held, "rhud_ttt_ammo2", 265, ScrH() - 40, color_white )
 end
