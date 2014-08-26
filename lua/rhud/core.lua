@@ -5,7 +5,8 @@ RHUD = RHUD or {
 		["terrortown"] = "none",
 	}, 
 	Drawing = false,
-	Huds = {} 
+	Huds = {},
+	ToRegister = {},
 }
 
 RHUD.Fallback = {
@@ -52,9 +53,14 @@ function RHUD:GetFullHudNamed( n ) return self.FullHuds[n] end
 function RHUD:RegisterHud( hud, name )
 	name = name or hud.Name:lower()
 	
+	if not RHUD.GamemodeLoaded then
+		self.ToRegister[name] = hud
+		return
+	end
+	
 	self.Huds[name] = nil
-	if GAMEMODE and hud.Gamemode then 
-		if GAMEMODE.FolderName:lower() ~= hud.Gamemode:lower() then return end 
+	if hud.Gamemode then 
+		if GAMEMODE_NAME:lower() ~= hud.Gamemode:lower() then return end 
 	end
 	
 	self.Huds[name] = setmetatable( hud, self.Fallback ) 
@@ -65,6 +71,14 @@ function RHUD:RegisterHud( hud, name )
 	end
 end
 RHUD:RegisterHud( { Name = "No Custom Hud", None = true }, "none" )
+
+local function register()
+	RHUD.GamemodeLoaded = true
+	for name, hud in pairs( RHUD.ToRegister ) do
+		RHUD:RegisterHud( hud, name )
+	end
+end
+hook.Add( "OnGamemodeLoaded", "RHUD_RegisterHuds", register )
 
 function RHUD:SelectHud( name )
 	if not self.Initialized or not self.Huds[name] then return end
@@ -159,7 +173,8 @@ function RHUD:Init()
 			end
 		end
 	
-	self.Gamemode = gmod.GetGamemode().FolderName:lower()
+	self.Gamemode = GAMEMODE_NAME:lower()
+	print( "RHUD Init - ", self.Gamemode )
 	for name, hud in pairs( self.Huds ) do
 		if hud.Gamemode then
 			if hud.Gamemode ~= self.Gamemode then
@@ -276,6 +291,42 @@ hook.Add( "HUDShouldDraw", "RHUD_HideDarkRPHUD", function( name )
 		if hud.HideElements[name] ~= nil then
 			return hud.HideElements[name]
 		end
+	end
+end )
+
+hook.Add( "HUDDrawPickupHistory", "RHUD_PickupHistory", function()
+	local hud = RHUD:GetHud( true )
+	if not hud or hud.None then return end
+	if hud.DrawPickupHistory then
+		hud:DrawPickupHistory()
+		return true
+	end
+end )
+
+hook.Add( "HUDAmmoPickedUp", "RHUD_PickupAmmo", function( item, amount )
+	local hud = RHUD:GetHud( true )
+	if not hud or hud.None then return end
+	if hud.DrawAmmoPickup then
+		hud:DrawAmmoPickup( item, amount )
+		return true
+	end
+end )
+
+hook.Add( "HUDWeaponPickedUp", "RHUD_PickupWeapon", function( weapon )
+	local hud = RHUD:GetHud( true )
+	if not hud or hud.None then return end
+	if hud.DrawWeaponPickup then
+		hud:DrawWeaponPickup( weapon )
+		return true
+	end
+end )
+
+hook.Add( "HUDDrawTargetID", "RHUD_TargetID", function()
+	local hud = RHUD:GetHud( true )
+	if not hud or hud.None then return end
+	if hud.DrawTargetID then
+		hud:DrawWeaponPickup( LocalPlayer():GetEyeTrace() )
+		return true
 	end
 end )
 
