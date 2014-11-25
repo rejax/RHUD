@@ -1,6 +1,7 @@
 RIM = RIM or { Huds = {}, Parser = {} }
 
 function RIM:Init()
+	self.Huds = {}
 	local huds = file.Find( "data/rim/*.txt", "GAME" )
 	
 	for _, name in pairs( huds ) do
@@ -9,6 +10,7 @@ function RIM:Init()
 	end
 end
 hook.Add( "InitPostEntity", "RIM_Init", function() RIM:Init() end )
+concommand.Add( "rim_reload", function() RIM:Init() end )
 
 function RIM:Build( name )
 	self.Huds[name] = { Variables = {}, Config = {}, Functions = {} }

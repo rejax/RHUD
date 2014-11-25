@@ -82,9 +82,11 @@ function RHUD:OpenChoiceMenu()
 		choice:Construct()
 		base.Choice = choice
 	PaintDropDown( choice, Color( 220, 220, 220 ), Color( 120, 120, 120 ), Color( 150, 150, 150 ), Color( 180, 180, 180 ) )
-		
+	
+	local buttonpos = base:GetWide() - close:GetWide()
+	local sep = 21
 	local options = vgui.Create( "DImageButton", base )
-		options:SetPos( base:GetWide() - close:GetWide() - 21, 4.5 )
+		options:SetPos( buttonpos - sep, 4.5 )
 		options:SetSize( 16, 16 )
 		options:SetImage( "icon16/wrench.png" )
 		options.DoClick = function() base.Options = self:Options( base ) end
@@ -96,7 +98,7 @@ function RHUD:OpenChoiceMenu()
 		
 	if RIM then
 		local rim = vgui.Create( "DImageButton", base )
-			rim:SetPos( base:GetWide() - close:GetWide() - 46, 4.5 )
+			rim:SetPos( buttonpos - sep * 2 - 4, 4.5 )
 			rim:SetSize( 16, 16 )
 			rim:SetImage( "icon16/script_edit.png" )
 			rim.DoClick = function() RIM.Editor:Open() close:DoClick() end
@@ -106,6 +108,23 @@ function RHUD:OpenChoiceMenu()
 				surface.DisableClipping( false )
 			end
 	end
+	
+	if buildr then
+		local build = vgui.Create( "DImageButton", base )
+			build:SetPos( buttonpos - sep * 3 - 8, 4.5 )
+			build:SetSize( 16, 16 )
+			build:SetImage( "icon16/cog.png" )
+			build.DoClick = function() buildr.open() close:DoClick() end
+			build.Paint = function( s, w, h )
+				surface.DisableClipping( true )
+					draw.RoundedBox( 0, -4, -4, w + 9, h + 9, Color( 100, 100, 100, 150 ) )
+				surface.DisableClipping( false )
+			end
+	end
+	
+	-- ^
+	-- should probably automate these buttons at some point
+	-- oh well
 	
 	self.MenuFrame = base
 end

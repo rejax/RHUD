@@ -124,8 +124,8 @@ function RIM:Compile( hud, success, fail )
 		Player = LocalPlayer(), ply = LocalPlayer(), 
 		ScrH = ScrH(), ScrW = ScrW(),
 		Color = Color, Material = Material,
-		Lerp = Lerp, GetRoundTime = roundtime,
-		draw = draw, surface = surface, render = render, math = math,
+		Lerp = Lerp, GetRoundTime = roundtime, CurTime = CurTime,
+		draw = draw, surface = surface, render = render, math = math, string = string,
 		print = print,
 	}
 	table.foreach( colors, function( k, col ) env[k] = col end )
