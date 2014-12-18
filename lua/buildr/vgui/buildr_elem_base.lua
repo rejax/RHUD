@@ -3,7 +3,6 @@ local BASE = {}
 function BASE:Init()
 	self:SetSize( 100, 100 )
 	self.Round = 0
-	self.edits = buildr.get( self.class ).edits
 	
 	self.Bound = {}
 end
@@ -54,13 +53,10 @@ function BASE:PaintPreview( w, h )
 	draw.RoundedBox( 4, 0, 0, w, h, HSVToColor( CurTime() % 360, .5, .5 ) --[[Color( 100, 0, 0 )]] )
 end
 
-BASE.Code = {
-	"draw.RoundedBox( %d, $x$, $y$, %d, %d, $color$ )"
-}
 function BASE:GetCode()
-	local code = table.Copy( self.Code )
-	code[1] = code[1]:format( self.Round, self:GetWide(), self:GetTall() )
-	return code
+	return {
+		("draw.RoundedBox( %d, $x$, $y$, %d, %d, $color$ )"):format( self.Round, self:GetWide(), self:GetTall() )
+	}
 end
 
 function BASE:GetCodeVar( name )
@@ -84,11 +80,13 @@ function BASE:OnMousePressed( m )
 		return
 	end
 	
+	local _x, _y = self:CursorPos()
 	if m == MOUSE_LEFT then
-		local _x, _y = self:CursorPos()
-		self.Dragging = { x = _x, y = _y }
+		local suppress = self:LeftClick( _x, _y )
+		if not suppress then self.Dragging = { x = _x, y = _y } end
 	elseif m == MOUSE_RIGHT then
-		self:RightClick()
+		local suppress = self:RightClick( _x, _y )
+		if not suppress then self:OpenDermaMenu() end
 		self:OnMouseReleased( MOUSE_LEFT )
 	end
 end
@@ -99,7 +97,10 @@ function BASE:OnMouseReleased( m )
 	end
 end
 
-function BASE:RightClick()
+function BASE:LeftClick() end
+function BASE:RightClick() end
+
+function BASE:OpenDermaMenu()
 	local menu = DermaMenu()
 	
 	menu:AddOption( ("panel [%d] [%s]"):format( self.id, self.name or self.class ) ):SetIcon( "icon16/information.png" )
@@ -270,7 +271,7 @@ local TWEEN_BOTTOM = 2
 local TWEEN_LEFT = 3
 local TWEEN_RIGHT = 4
 
-local tw_in, tw_col = Color( 200, 200, 50 ), Color( 230, 230, 90 )
+local tw_in, tw_col = Color( 120, 140, 50 ), Color( 160, 170, 90 )
 function BASE:CreateSizeTweens()
 	if self.HideTweens then return end
 	local tweens = {}
@@ -341,28 +342,41 @@ function BASE:UpdateBound( force )
 	if self.BoundTo and not IsValid( self.BoundTo ) then self.BoundTo = nil end
 end
 
+function BASE:LocalToGrid( x, y )
+	local x_sc, y_sc = self:LocalToScreen( x or 0, y or 0 )
+	local gx, gy = buildr.base:SnapToGrid( x_sc, y_sc )
+	return self:ScreenToLocal( gx, gy )
+end
+
+function BASE:Update() end
 function BASE:Think()
 	self:UpdateSaveVariables()
 	self:UpdateBound()
+	
+	local stop = self:Update()
+	
+	if stop then return end
 	if self.EditingSize then
 		local e, p = self.EditingSize, self.EditingSizeInit
 		local mx, my = gui.MouseX(), gui.MouseY()
 		
 		if e == TWEEN_TOP then
+		
 		elseif e == TWEEN_BOTTOM then
 			local dist = p.h + ( my - p.y )
-			self:SetTall( dist )
+			local x, y = self:LocalToGrid( 0, dist )
+			self:SetTall( y )
 		elseif e == TWEEN_LEFT then
 		
 		elseif e == TWEEN_RIGHT then
-			local dist = p.w + ( mx - p.x )
-			self:SetWide( dist )
+			self:SetWide( self:LocalToGrid( p.w + ( mx - p.x ) ) )
 		end
 	end
 	if not self.Dragging then return end
 	if not input.IsMouseDown( MOUSE_LEFT ) then self.Dragging = false return end
 	
-	local offx, offy = gui.MouseX() - self.Dragging.x, gui.MouseY() - self.Dragging.y
+	-- will only snap if grid is enabled
+	local offx, offy = buildr.base:SnapToGrid( gui.MouseX() - self.Dragging.x, gui.MouseY() - self.Dragging.y )
 	self:SetPos( offx, offy )
 	
 	self.BoundDirty = true

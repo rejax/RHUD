@@ -255,8 +255,5 @@ end
 
 buildr.register( "Text", {
 	description = "Text, with useful features.",
-	edits = {
-	
-	},
 	panel = TEXT,
 } )

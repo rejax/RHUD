@@ -17,6 +17,8 @@ function PANEL:Init()
 	buildr.in_editor = true
 	buildr.base = self
 	self.name = "undefined"
+	self.canvas_clickbacks = {}
+	self.canvas_drawfuncs = {}
 	
 	self:OpenModeRequest()
 end
@@ -48,6 +50,18 @@ function PANEL:OnMousePressed( m )
 	elseif m == MOUSE_LEFT then
 		buildr.binding = nil
 	end
+	
+	for _, func in ipairs( self.canvas_clickbacks ) do func( m, gui.MousePos() ) end
+end
+
+function PANEL:RegisterCanvasClickCallback( func )
+	table.insert( self.canvas_clickbacks, func )
+	return #self.canvas_clickbacks
+end
+
+function PANEL:RegisterCanvasDrawFunc( func )
+	table.insert( self.canvas_drawfuncs, func )
+	return #self.canvas_drawfuncs
 end
 
 local disabled = Color( 140, 120, 120 )
@@ -116,7 +130,7 @@ function PANEL:OpenModeRequest()
 						local menu = DermaMenu()
 						menu:AddOption( "Delete '" .. line.name .. "'?", function()
 							Derma_Query( "Delete " .. line.name .. "?", "", "OK", function()
-								buildr.delete( line.name )
+								buildr.delete( line.name, true )
 								s:RemoveLine( i )
 								if #s:GetLines() < 1 then
 									self:OpenModeRequest()
@@ -158,18 +172,28 @@ function PANEL:RightClick()
 		self:ManageOrder()
 	end ):SetIcon( "icon16/shape_move_back.png" )
 	
-	menu:AddOption( "Build to RHUD", function()
+	menu:AddOption( "Manage Grid", function()
+		self:ManageGrid()
+	end ):SetIcon( "icon16/layout.png" )
+	
+	local build = menu:AddSubMenu( "Build" )
+	
+	build:AddOption( "Build to RHUD", function()
 		buildr.build( "rhud", self.Elements )
 	end ):SetIcon( "icon16/wrench_orange.png" )
 	
 	if RIM then
-		menu:AddOption( "Build to RIM", function()
+		build:AddOption( "Build to RIM", function()
 			buildr.build( "rim", self.Elements )
 		end ):SetIcon( "icon16/wrench.png" )
 	end
 	
-	menu:AddOption( "Save State", function()
-		buildr.save( self.Elements, self.name )
+	build:AddOption( "Build to Lua", function()
+		buildr.build( "lua", self.Elements )
+	end ):SetIcon( "icon16/script_code.png" )
+		
+	menu:AddOption( "Save", function()
+		buildr.save( self.Elements, self.name, "saved" )
 	end ):SetIcon( "icon16/disk.png" )
 	
 	menu:Open()
@@ -177,7 +201,6 @@ end
 
 function PANEL:ManageOrder()
 	local popup = vgui.Create( "DFrame", self )
-		popup:SetTitle( "Manage Order" )
 		popup:SetSize( 400, 500 )
 		popup:SetPos( buildr.gui_mousechop( popup:GetSize() ) )
 		popup:MakePopup()
@@ -257,12 +280,11 @@ end
 
 function PANEL:CreateElementSelect()
 	local popup = vgui.Create( "DFrame", self )
-		popup:SetTitle( "Choose Element" )
 		popup:SetSize( 400, 400 )
 		popup:SetPos( buildr.gui_mousechop( popup:GetSize() ) )
 		popup:MakePopup()
 		self.SuppressClick = popup
-		buildr.attach_panel_extras( popup )
+		buildr.attach_panel_extras( popup, false, "Create Element"  )
 	
 	local text = vgui.Create( "DLabel", popup )
 		text:Dock( TOP )
@@ -311,6 +333,30 @@ function PANEL:CreateElementSelect()
 	end
 end
 
+function PANEL:ManageGrid()
+	local popup = vgui.Create( "DFrame", self )
+		popup:SetSize( 400, 55 )
+		popup:SetPos( buildr.gui_mousechop( popup:GetSize() ) )
+		popup:MakePopup()
+		self.SuppressClick = popup
+		buildr.attach_panel_extras( popup, false, "Manage Grid" )
+	
+	local choice = vgui.Create( "DComboBox", popup )
+		choice:Dock( TOP )
+		choice:SetValue( self.Grid or "Disabled" )
+		for _, val in ipairs( { "Disabled", 8, 16, 32, 64 } ) do choice:AddChoice( val ) end
+		choice.OnSelect = function( _, _, value )
+			self.Grid = isnumber( value ) and value or nil
+		end
+end
+
+function PANEL:SnapToGrid( x, y )
+	if ( not self.Grid or isstring( self.Grid ) ) then
+		return x, y
+		else return math.Round( x / self.Grid ) * self.Grid, math.Round( y / self.Grid ) * self.Grid
+	end
+end
+
 function PANEL:CreateElement( class, info )
 	local pnl = vgui.Create( class, self )
 		pnl:SetPos( gui.MousePos() )
@@ -327,16 +373,35 @@ function PANEL:RemoveElement( pnl )
 	pnl:Remove()
 end
 
-local tick = Material( "icon16/accept.png" )
-local cross = Material( "icon16/cancel.png" )
-function PANEL:DoSaveEffect( success )
-	self.SaveEffect = { CurTime(), success and tick or cross }
+surface.CreateFont( "buildr_save", {
+	font = "Roboto",
+	size = 16,
+	weight = 600
+} )
+
+function PANEL:AddCursorMessage( material, message, time, color )
+	self.CursorEffect = { start = CurTime(), icon = material, text = message, duration = time or 3, color = color or color_white, alpha = 255, alpha2 = 255 }
 end
 
-local effect_time = 3
+local tick = Material( "icon16/accept.png" )
+local cross = Material( "icon16/cancel.png" )
+function PANEL:DoSaveEffect( success, message )
+	self:AddCursorMessage( success and tick or cross, message, 3 )
+end
+
 function PANEL:Paint( w, h )
-	surface.SetDrawColor( 0, 0, 0, 100 )
+	surface.SetDrawColor( 0, 0, 0, 120 )
 	surface.DrawRect( 0, 0, w, h )
+	
+	if self.Grid then
+		if isstring( self.Grid ) then self.Grid = nil end
+		local w, h = ScrW(), ScrH()
+		surface.SetDrawColor( 255, 255, 255, 50 )
+		for step = self.Grid, ScrW(), self.Grid do
+			surface.DrawLine( 0, step, w, step )
+			surface.DrawLine( step, 0, step, h )
+		end
+	end
 	
 	surface.SetDrawColor( buildr.white )
 	
@@ -345,6 +410,12 @@ function PANEL:Paint( w, h )
 			pnl:SetPaintedManually( false )
 			pnl:PaintManual()
 			pnl:SetPaintedManually( true )
+			
+			if buildr.debug then
+				local x, y = pnl:GetPos()
+				local w, h = pnl:GetSize()
+				draw.RoundedBox( 0, x, y, w, h, Color( 200, 200, 200, 100 ) )
+			end
 		else
 			table.remove( self.Elements, k )
 		end
@@ -357,16 +428,27 @@ function PANEL:Paint( w, h )
 		surface.DrawLine( px + ( sw / 2 ), py + ( sh / 2 ), gui.MouseX(), gui.MouseY() )
 	end
 	
-	if self.SaveEffect then
-		local passed = CurTime() - self.SaveEffect[1]
-		if passed < effect_time then
-			surface.SetMaterial( self.SaveEffect[2] )
-			surface.SetDrawColor( 255, 255, 255, 255 - 255 * ( 1 * ( passed / effect_time ) ) )
-			surface.DrawTexturedRect( gui.MouseX() + 24, gui.MouseY(), self.SaveEffect[2]:Width(), self.SaveEffect[2]:Height() )
+	local effect = self.CursorEffect
+	if effect then
+		local passed = CurTime() - effect.start
+		if passed < effect.duration then
+			--effect.alpha = 255 - 255 * ( 1 * ( passed / effect.duration ) )
+			effect.alpha = 255 - buildr.circular_ease_in_out( passed, 1, 255, effect.duration )
+			
+			surface.SetMaterial( effect.icon )
+			surface.SetDrawColor( 255, 255, 255, effect.alpha )
+			surface.DrawTexturedRect( gui.MouseX() + 24, gui.MouseY(), effect.icon:Width(), effect.icon:Height() )
+			
+			surface.SetFont( "buildr_save" )
+			surface.SetTextColor( ColorAlpha( effect.color, effect.alpha ) )
+			surface.SetTextPos( gui.MouseX() + 24, gui.MouseY() + effect.icon:Height() + 2 )
+			surface.DrawText( effect.text )
 		else
 			self.SaveEffect = nil
 		end
 	end
+	
+	for _, func in ipairs( self.canvas_drawfuncs ) do func( w, h ) end
 end
 
 vgui.Register( "buildr_base", PANEL, "EditablePanel" )
