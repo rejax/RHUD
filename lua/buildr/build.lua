@@ -3,7 +3,7 @@ for _, d in pairs( { "builds", "builds/rhud", "builds/rim", "builds/lua", "saves
 	file.CreateDir( "buildr/" .. d )
 end
 
-local lua_base = [[local HUD = { materials = {} }
+local lua_base = [[local HUD = { materials = {}, polygons = {} }
 
 function HUD:CreateFont( name, font, size, t )
 	t.font = font

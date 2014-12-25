@@ -128,7 +128,7 @@ function RIM.Parser:ReplaceKeywords( text, str )
 	return m
 end
 
-RIM.Parser.Functions["DrawText"] = function( a, line, _, _, realline )
+RIM.Parser.Functions["DrawText%("] = function( a, line, _, _, realline )
 	line = string.Implode( " ", line )
 	local args = string.Explode( ",", realline )
 	

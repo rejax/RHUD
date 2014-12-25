@@ -64,16 +64,20 @@ function PANEL:RegisterCanvasDrawFunc( func )
 	return #self.canvas_drawfuncs
 end
 
-local disabled = Color( 140, 120, 120 )
+local disabled = Color( 110, 100, 100 )
 local hover = Color( 140, 140, 140 )
-local unhover = Color( 200, 200, 200 )
+local unhover = Color( 160, 160, 160 )
 function PANEL:OpenModeRequest()
 	local popup = vgui.Create( "DFrame", self )
-		popup:SetTitle( "Begin as" )
 		popup:SetSize( 200, 200 )
 		popup:Center()
 		self.SuppressClick = popup
-		
+	
+	local function go_back()
+		self:OpenModeRequest()
+		popup:Remove()
+	end
+	
 	for i = 0, 1 do
 		local new = tobool( i )
 		
@@ -86,6 +90,12 @@ function PANEL:OpenModeRequest()
 				popup.MenuBar:SetText( s:GetText() )
 				popup.button0:Remove()
 				popup.button1:Remove()
+				
+				local back = vgui.Create( "DImageButton", popup.MenuBar )
+					back:SetImage( "icon16/arrow_left.png" )
+					back:SetPos( popup.MenuBar:GetWide() - 24, popup.MenuBar:GetTall() / 2 - 8 )
+					back:SetSize( 16, 16 )
+					back.DoClick = go_back
 				
 				if new then
 					local desc = vgui.Create( "DLabel", popup )
@@ -133,8 +143,7 @@ function PANEL:OpenModeRequest()
 								buildr.delete( line.name, true )
 								s:RemoveLine( i )
 								if #s:GetLines() < 1 then
-									self:OpenModeRequest()
-									popup:Remove()
+									go_back()
 								end
 							end, "Cancel" )
 						end ):SetIcon( "icon16/cancel.png" )
@@ -201,7 +210,7 @@ end
 
 function PANEL:ManageOrder()
 	local popup = vgui.Create( "DFrame", self )
-		popup:SetSize( 400, 500 )
+		popup:SetSize( 400, 50 )
 		popup:SetPos( buildr.gui_mousechop( popup:GetSize() ) )
 		popup:MakePopup()
 		self.SuppressClick = popup
@@ -233,6 +242,10 @@ function PANEL:ManageOrder()
 			p.id = pnl.id
 			p.pnl = pnl
 			
+			if not popup.Sized then
+				popup:SetTall( math.min( popup:GetTall() + (p:GetTall() + 10), 600 ) )
+			end
+			
 			p.OnCursorEntered = function( s ) s.In = true end
 			p.OnCursorExited = function( s ) s.In = false end
 			p.Paint = function( s, w, h )
@@ -261,12 +274,14 @@ function PANEL:ManageOrder()
 				self:SwapElementOrder( pnl.id, s.id )
 				i:LayoutItems()
 			end )
-			
 		end
 	end
 	items:LayoutItems()
+	popup:SetTall( popup:GetTall() + 10 )
+	popup.Sized = true
 end
 
+local random_number = 1457 -- no conflict
 function PANEL:SwapElementOrder( id1, id2 )
 	local pnl1, pnl2 = self.Elements[id1], self.Elements[id2]
 	
@@ -274,8 +289,8 @@ function PANEL:SwapElementOrder( id1, id2 )
 	self.Elements[id2] = pnl1
 	pnl1.id = id2
 	pnl2.id = id1
-	pnl1:SetZPos( 1457 + pnl1.id )
-	pnl2:SetZPos( 1457 + pnl2.id )
+	pnl1:SetZPos( random_number + pnl1.id )
+	pnl2:SetZPos( random_number + pnl2.id )
 end
 
 function PANEL:CreateElementSelect()
@@ -359,9 +374,10 @@ end
 
 function PANEL:CreateElement( class, info )
 	local pnl = vgui.Create( class, self )
-		pnl:SetPos( gui.MousePos() )
+		pnl:SetPos( self:SnapToGrid( gui.MousePos() ) )
 		if info.show_tweens then pnl:CreateSizeTweens() end
-		pnl.id = table.insert( self.Elements, pnl )
+		table.insert( self.Elements, pnl )
+		pnl.id = #self.Elements
 		pnl:SetZPos( 1457 + pnl.id )
 		pnl:SetPaintedManually( false )
 	return pnl

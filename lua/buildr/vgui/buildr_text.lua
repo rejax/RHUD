@@ -7,9 +7,9 @@ TEXT.SaveVariables = {
 				font = var.font,
 				weight = var.weight,
 			} )
-		self.font = var.name
-		self.text = var.text
-	end
+	end,
+	font = true,
+	text = true,
 }
 
 surface.CreateFont( "buildr_default", {
@@ -39,10 +39,6 @@ end
 
 function TEXT:GetCode()
 	return { ('draw.SimpleText( "%s", "%s", $x$, $y$, $color$ )'):format( self:GetConcatText(), self.font_tab.name ) }
-end
-
-function TEXT:GetCodeVar( name )
-	return ""
 end
 
 function TEXT:GetInitCode()
@@ -210,23 +206,27 @@ local escapes = {
 			if isstring( func ) then return func end
 			setfenv( func, meta )
 			func()
+			
 			return tostring( meta.RETVAL )
 	end, 
 	function( text )
-		return text:sub( 3, -2 )
+		return "tostring( " .. text:sub( 3, -2 ) .. " )"
 	end }
 }
 
 function TEXT:GetConcatText()
 	local t = self.text
 	for pat, rep in pairs( escapes ) do
-		t = t:gsub( pat, function( text ) return "|*" .. rep[2]( text ) .. "*|" end )
+		t = t:gsub( pat, function( text )
+			return "|*" .. rep[2]( text ) .. "*|" 
+		end )
 	end
 	return t
 end
 
 function TEXT:GetTextParsed()
 	local text = self.text
+	if not text then return "????" end
 	
 	for pat, rep in pairs( escapes ) do
 		text = text:gsub( pat, rep[1] )
@@ -254,6 +254,6 @@ function TEXT:Paint( w, h )
 end
 
 buildr.register( "Text", {
-	description = "Text, with useful features.",
+	description = "draw words on the screen",
 	panel = TEXT,
 } )

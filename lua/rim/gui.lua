@@ -52,6 +52,8 @@ RIM.Editor.Styles = {
 	}
 }
 
+local is_empty = function( s ) return s:gsub( "[%s\t]", "" ) == "" end
+
 for _, v in pairs( RIM.Editor.Styles.Fonts.available ) do
 	surface.CreateFont( "rim_code_"..v, {
 		font = v,
@@ -544,7 +546,7 @@ function RIM.Editor:BuildTab( parent, code_tab, name, web )
 	
 	edit.IsSaved = function( s )
 		if s.Edit:IsVisible() then s:LoseFocus( true ) end
-		if #s.Lines == 1 and not s.Lines[1]:GetText():find( "%a" ) then return true end
+		if #s.Lines == 1 and not s.Lines[1]:GetText():gsub( "[%s\t]", "" ) ~= "" then return true end
 		for l, pnl in pairs( s.Lines ) do
 			if s.Code[l] ~= pnl:GetText() then return false end
 		end
@@ -556,7 +558,7 @@ function RIM.Editor:BuildTab( parent, code_tab, name, web )
 		for line, code in pairs( edit.Code ) do
 			local l = vgui.Create( "DLabel", scroll )
 				local formcode = self:FormatCode( code )
-				l.IsEmpty = not formcode:find( "%a" )
+				l.IsEmpty = not formcode:gsub( "[%s\t]", "" ) == ""
 				if l.IsEmpty then formcode = " " end
 				l:SetPos( 5, pos )
 				l:SetText( formcode )
@@ -760,7 +762,7 @@ function RIM.Editor:MakeTextEditor( parent, wide, edit_t )
 		edit.Hidden = false
 		
 		edit.OnKeyCode = function( s, key )
-			if edit_t.FirstLetter and not s:GetText():find( "%a" ) then
+			if edit_t.FirstLetter and not is_empty( s:GetText() ) then
 				s:SetText( s:GetText():sub( 2 ) )
 				edit_t.FirstLetter = false
 			end
@@ -768,7 +770,7 @@ function RIM.Editor:MakeTextEditor( parent, wide, edit_t )
 				local cpos = s:GetCaretPos()
 				local line = edit_t.ActiveLinePanel
 				
-				if s:GetText():find( "%a" ) then
+				if not is_empty( s ) then
 					if cpos ~= s:GetText():len() then
 						local p, text = s:GetCaretIndent()
 						if text then
@@ -790,7 +792,7 @@ function RIM.Editor:MakeTextEditor( parent, wide, edit_t )
 					s:SetCaretPos( cpos + 6 ) 
 				end )
 			elseif key == KEY_BACKSPACE then
-				if s:GetCaretPos() == 0 and not s:GetText():find( "%a" ) then
+				if s:GetCaretPos() == 0 and is_empty( s ) then
 					edit_t:BackLine()
 				end
 			elseif key == KEY_UP then

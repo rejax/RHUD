@@ -26,7 +26,8 @@ function RIM:Parse( rim, t )
 			end
 		end
 		
-		if not s:find( "%a" ) then whitespace = whitespace + 1 else last_text_line = line end
+		local is_whitespace = s:gsub( "[%s\t]", "" ) == ""
+		if is_whitespace then whitespace = whitespace + 1 else last_text_line = line end
 		if code:find( "<>" ) then funcd = false whitespace = 0 end
 		if whitespace > 0 and funcd and ( lines[line+1] and ( lines[line+1] == "" or lines[line+1]:find( "->" ) ) ) then 
 			s = "end"
@@ -126,7 +127,7 @@ function RIM:Compile( hud, success, fail )
 		Color = Color, Material = Material,
 		Lerp = Lerp, GetRoundTime = roundtime, CurTime = CurTime,
 		draw = draw, surface = surface, render = render, math = math, string = string,
-		print = print,
+		print = print, tostring = tostring,
 	}
 	table.foreach( colors, function( k, col ) env[k] = col end )
 	
