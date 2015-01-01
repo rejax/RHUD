@@ -246,6 +246,7 @@ function PANEL:ManageOrder()
 			
 			if not popup.Sized then
 				popup:SetTall( math.min( popup:GetTall() + (p:GetTall() + 10), 600 ) )
+				popup:SetPos( buildr.gui_mousechop( popup:GetSize() ) )
 			end
 			
 			p.OnCursorEntered = function( s ) s.In = true end

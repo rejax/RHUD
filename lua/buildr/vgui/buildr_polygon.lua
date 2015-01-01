@@ -61,7 +61,7 @@ function POLY:AddRightClickOptions( menu )
 		self.startx, self.starty = self:GetPos()
 		self.startw, self.starth = self:GetSize()
 		self.startpoly = table.Copy( self.poly )
-	end )
+	end ):SetIcon( "icon16/vector_add.png" )
 	
 	--[[
 	menu:AddOption( "Print Poly", function()
