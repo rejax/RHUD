@@ -42,7 +42,7 @@ local formats = {
 		function_name = "function HUD:%s()",
 		terminator = "end",
 		scr = "()",
-		start = 2,
+		start = 1,
 		finalize = function( code, name )
 			local files = file.Find( "buildr/builds/rhud/*.txt", "DATA" )
 				file.Write( "buildr/builds/rhud/" .. name .. ".txt", code )
