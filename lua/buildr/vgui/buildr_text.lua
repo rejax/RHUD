@@ -8,7 +8,6 @@ TEXT.SaveVariables = {
 				weight = var.weight,
 			} )
 	end,
-	font = true,
 	text = true,
 }
 
@@ -29,12 +28,11 @@ local info = ([[
 	#{code} is parsed as lua
 ]]):gsub( "\t", "   " )
 
+TEXT.font_tab = { name = "buildr_default", font = "Arial", size = 24, weight = 600, text = "TEXT" }
+TEXT.text = "TEXT"
+
 function TEXT:Init()
-	self.font = "buildr_default"
-	self.text = "TEXT"
-	
 	self:SizeToText()
-	self.font_tab = { name = "buildr_default_gen", font = "default", size = 16, weight = 600, text = "TEXT" }
 end
 
 function TEXT:GetCode()
@@ -53,7 +51,7 @@ function TEXT:GetSetupCode()
 end
 
 function TEXT:SizeToText()
-	surface.SetFont( self.font )
+	surface.SetFont( self.font_tab.name )
 	local w, h = surface.GetTextSize( self:GetTextParsed() )
 	self:SetSize( w, h )
 end
@@ -164,7 +162,6 @@ function TEXT:CreateFont()
 				font = font_name._Value,
 				weight = weight._Value,
 			} )
-			self.font = fname
 			self:SizeToText()
 			popup:Remove()
 		end
@@ -196,8 +193,16 @@ function TEXT:EditText()
 end
 
 local escapes = {
-	["#n"] = { function() return LocalPlayer():Nick() end, function() return "LocalPlayer():Nick()" end },
-	["#%b{}"] = { function( text )
+	["#n"] = { 
+		function() 
+			return LocalPlayer():Nick() 
+		end, 
+		function() 
+			return "LocalPlayer():Nick()" 
+		end 
+	},
+	["#%b{}"] = { 
+		function( text )
 			local code = text:sub( 3, -2 )
 			local env = { __index = _G }
 			local meta = setmetatable( { RETVAL = "???" }, env )
@@ -208,10 +213,11 @@ local escapes = {
 			func()
 			
 			return tostring( meta.RETVAL )
-	end, 
-	function( text )
-		return "tostring( " .. text:sub( 3, -2 ) .. " )"
-	end }
+		end, 
+		function( text )
+			return "tostring( " .. text:sub( 3, -2 ) .. " )"
+		end 
+	}
 }
 
 function TEXT:GetConcatText()
@@ -247,7 +253,7 @@ function TEXT:PaintPreview( w, h, pnl )
 end
 
 function TEXT:Paint( w, h )
-	surface.SetFont( self.font )
+	surface.SetFont( self.font_tab.name )
 	surface.SetTextColor( self:GetColor() )
 	surface.SetTextPos( 0, 0 )
 	surface.DrawText( self:GetTextParsed() )

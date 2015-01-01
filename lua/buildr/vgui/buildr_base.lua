@@ -31,6 +31,7 @@ end
 function PANEL:MakeMenuBar()
 	self.MenuBar = vgui.Create( "buildr_menubar", self )
 		self.MenuBar:SetSize( ScrW(), 30 )
+		self.MenuBar:AddOptions()
 		self.MenuBar.IsBase = self
 end
 
@@ -134,6 +135,7 @@ function PANEL:OpenModeRequest()
 					list.OnRowSelected = function( _, _, line )
 						if input.IsMouseDown( MOUSE_RIGHT ) then return end -- dirty hack
 						buildr.load( line.name )
+						self.Working = true
 						popup:Remove()
 					end
 					list.OnRowRightClick = function( s, i, line )
@@ -384,8 +386,8 @@ function PANEL:CreateElement( class, info )
 end
 
 function PANEL:RemoveElement( pnl )
-	table.remove( self.Elements, pnl.id )
 	if pnl.BoundTo then pnl.BoundTo.Bound[self] = nil end
+	table.remove( self.Elements, pnl.id )
 	pnl:Remove()
 end
 
@@ -475,6 +477,26 @@ do
 	function MBAR:Init()
 		self.Button = vgui.Create( "buildr_closebutton", self )
 		self.Button:Setup( self:GetParent(), 100, 30 )
+	end
+	
+	function MBAR:AddOptions()
+		self.Options = vgui.Create( "DImageButton", self )
+		self.Options:SetImage( "icon16/wrench.png" )
+		self.Options:SetSize( 16, 16 )
+		self.Options:SetPos( ScrW() - 123, 7 )
+		
+		self.Options.DoClick = function( s )
+			if not buildr.base.Working then return end
+			
+			local menu = DermaMenu()
+			
+			menu:AddOption( "Exit To Menu", function()
+				timer.Simple( 0, buildr.open )
+				buildr.base:Remove()
+			end ):SetIcon( "icon16/arrow_left.png" )
+			
+			menu:Open()
+		end
 	end
 	
 	function MBAR:SetText( text )

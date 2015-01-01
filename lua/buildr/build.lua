@@ -181,12 +181,23 @@ function buildr.delete( name, full )
 	name = name:gsub( "%.dat$", "" )
 	
 	if full then
-		for _, p in ipairs( { "rim/%s.txt", "rhud/%s.txt", "lua/%s/lua/autorun/client/%s.txt", "lua/%s" } ) do
+		for _, p in ipairs( { "rim/%s.txt", "rhud/%s.txt", "lua/%s/lua/autorun/client/%s.txt" } ) do
 			file.Delete( "buildr/builds/" .. p:format( name, name ) )
 		end
 	end
 	
 	file.Delete( "rim/" .. name .. ".txt" )
+	
+	-- we can only delete directories if they are *empty*
+	-- cannot delete folders as of 2015
+	timer.Simple( 1, function()
+		local folders = { "lua", "autorun", "client" }
+		for i = 1, #folders do
+			file.Delete( "buildr/builds/" .. name .. "/" .. table.concat( folders, "/", 1, #folders - i + 1 ) )
+		end
+		file.Delete( "buildr/builds/" .. name )
+	end )
+	
 	if RIM then RIM.Huds[name] = nil end
 	if RHUD then 
 		RHUD:SelectHud( "none" )

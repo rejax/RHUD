@@ -62,9 +62,12 @@ function POLY:AddRightClickOptions( menu )
 		self.startw, self.starth = self:GetSize()
 		self.startpoly = table.Copy( self.poly )
 	end )
+	
+	--[[
 	menu:AddOption( "Print Poly", function()
 		print( self:GeneratePolyTable() )
 	end )
+	]]
 end
 
 function POLY:ClosestVertex( x, y )
