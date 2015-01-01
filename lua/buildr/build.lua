@@ -31,6 +31,14 @@ hook.Add( "HUDPaint", HUD, function()
 	HUD:Draw()
 end )]]
 
+local rim_naughty = {
+	["RHUD:"] = "",
+	["PaintAvatar"] = "DrawAvatar",
+	["LocalPlayer%(%)"] = "Player",
+	["ScrW%(%)"] = "ScrW",
+	["ScrH%(%)"] = "ScrH",
+}
+
 local formats = {
 	rhud = {
 		base = {
@@ -62,10 +70,8 @@ local formats = {
 		start = 1,
 		finalize = function( code, name )
 			local files = file.Find( "buildr/builds/rim/*.txt", "DATA" )
-				code = code:gsub( "RHUD:", "" )
-				code = code:gsub( "PaintAvatar", "DrawAvatar" )
-				code = code:gsub( "LocalPlayer%(%)", "Player" )
-			
+			for bad, replacement in pairs( rim_naughty ) do code = code:gsub( bad, replacement ) end
+				
 			local n = #files
 				file.Write( "buildr/builds/rim/" .. name .. ".txt", code )
 				file.Write( "rim/" .. name .. ".txt", code )

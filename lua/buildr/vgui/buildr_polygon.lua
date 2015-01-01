@@ -30,7 +30,11 @@ function POLY:GeneratePolyTable()
 	local t = {}
 	for i = 1, #self.poly do
 		local p = self.poly[i]
-		t[i] = ("\t\t[%d] = { x = %d, y = %d },"):format( i, self:LocalToScreen( p.x, p.y ) )
+		local px, py = self:LocalToScreen( p.x, p.y )
+		local x = ("ScrW() * %s"):format( px / ScrW() )
+		local y = ("ScrH() * %s"):format( py / ScrH() )
+		
+		t[i] = ("\t\t[%d] = { x = %s, y = %s },"):format( i, x, y )
 	end
 	t = (table.concat( t, "\n" )):sub( 1, -2 )
 	return "{\n" .. t .. "\n\t}"
