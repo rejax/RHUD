@@ -26,6 +26,7 @@ surface.CreateFont( "buildr_textpreview", {
 local info = ([[
 	#n becomes your nickname
 	#{code} is parsed as lua
+	#rp(var) - getDarkRPVar
 ]]):gsub( "\t", "   " )
 
 TEXT.font_tab = { name = "buildr_default", font = "Arial", size = 24, weight = 600, text = "TEXT" }
@@ -217,6 +218,14 @@ local escapes = {
 		function( text )
 			return "tostring( " .. text:sub( 3, -2 ) .. " )"
 		end 
+	},
+	["#rp%b()"] = {
+		function( text )
+			return LocalPlayer():getDarkRPVar( text:sub(5, -2) )
+		end,
+		function( text )
+			return "LocalPlayer():getDarkRPVar( \"" .. text:sub(5, -2) .. "\" )"
+		end,
 	}
 }
 
