@@ -75,7 +75,9 @@ function RHUD:OpenChoiceMenu()
 		choice.Construct = function( s, first )
 			s:Clear()
 			for name, tab in pairs( self.Huds ) do
-				s:AddChoice( tab.Name, name )
+				if not hook.Run("RHUDSuppressChoice", name, tab) then
+					s:AddChoice( tab.Name, name )
+				end
 			end
 			s:SetValue( "Choose a hud!" )
 		end
