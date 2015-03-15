@@ -325,7 +325,7 @@ hook.Add( "HUDDrawTargetID", "RHUD_TargetID", function()
 	local hud = RHUD:GetHud( true )
 	if not hud or hud.None then return end
 	if hud.DrawTargetID then
-		hud:DrawWeaponPickup( LocalPlayer():GetEyeTrace() )
+		hud:DrawTargetID( LocalPlayer():GetEyeTrace() )
 		return true
 	end
 end )
