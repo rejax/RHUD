@@ -238,7 +238,7 @@ function RHUD:InitTTT() -- holy fuck why (this was more of an experiment but fuc
 	local pad = 0
 	
 	for l, code in pairs( parts ) do
-		if pad > 2 then break end
+		if pad > 12 then break end
 		if code:find( "GM:HUDPaint" ) then
 			line_start = l
 			pad = 1
