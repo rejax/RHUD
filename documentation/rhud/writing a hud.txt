@@ -36,4 +36,6 @@ Some RHUD helper functions:
 	[RHUD:Include( id, file ) -- includes a file if your hud is in it's own folder]
 	
 If your hud has a function called ShowScoreboard, the scoreboard will be hidden.
-If you are writing a hud for TTT, adding a function called DrawWepSwitch( WSWITCH table ) will cause it to hide.
+If you are writing a hud for TTT, a number of TTT hud elements can be overridden, please see cl_hud.lua
+Also keep in mind that the TTT hud is detected and overridden from the client's copy of the game - so no
+changes to cl_hud.lua HUDPaint will have affect
