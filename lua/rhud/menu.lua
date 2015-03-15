@@ -61,7 +61,7 @@ function RHUD:OpenChoiceMenu()
 		label:Dock( TOP )
 		label.OnChangeHud = function(s)
 			local hud = self:GetHud( true )
-			if hud.Name == "No Custom Hud" then s:SetText( "You do not have a custom hud active." ) return end
+			if hud.Name == RHUD.Huds[RHUD.DefaultHud].Name then s:SetText( "You do not have a custom hud active." ) return end
 			s:SetText( "Current hud is " .. hud.Name )
 		end
 		label:OnChangeHud()
