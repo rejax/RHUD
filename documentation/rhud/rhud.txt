@@ -26,6 +26,9 @@ Configuration options can be set and autoread by doing
 Config options are saved in the local sqlite database, and can be accessed in the hud by 
 doing self:GetConfig( "config name" )
 
+The hook "RHUDSuppressChoice" can be used to hide huds from the selection menu. The arguments are the name and the
+hud itself, return true to suppress
+
 If you have any more questions ask or read through existing huds.
 You can sell any huds you make.
 
